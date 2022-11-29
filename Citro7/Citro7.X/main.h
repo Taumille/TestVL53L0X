@@ -15,8 +15,9 @@ extern "C" {
 #include <xc.h>
 #include "UART.h"
 #include "I2C.h"
-#include "Timers.h"
 #include "TOF.h"
+#include "reg_VL53L0X.h"
+#include "Timers.h"
 #include <stddef.h>
 
 #define SYS_FREQ        80000000UL

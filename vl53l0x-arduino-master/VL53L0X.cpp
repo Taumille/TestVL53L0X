@@ -778,7 +778,7 @@ void VL53L0X::startContinuous(uint32_t period_ms)
 
     if (osc_calibrate_val != 0)
     {
-      period_ms *= osc_calibrate_val;
+      period_ms = period_ms * osc_calibrate_val;
     }
 
     writeReg32Bit(SYSTEM_INTERMEASUREMENT_PERIOD, period_ms);

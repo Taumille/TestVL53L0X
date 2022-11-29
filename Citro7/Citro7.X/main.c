@@ -65,15 +65,17 @@ int main(void)
     
     
     uint32_t i=0;
-    
+    u8 d = 0x01;
+    u8 f = 0;
     
      // Transmit one character
 
     while(1){
         i++;
         Transmit_I2C_Loop();
-        if (i==100000){
-            TOF_Random();
+        if (i==1000){
+            TOF_I2C_Read(f, 2 , &d);
+            f++;
             i=0;
         }
     }
