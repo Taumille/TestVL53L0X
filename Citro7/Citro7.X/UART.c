@@ -82,7 +82,7 @@ void Send_Uart_Cmd(u8 symbol) {
     IEC0bits.U1TXIE = 1;
 }
 
-void printu(char * s){
+void printu(u8 * s){
     u16 i = 0;
     while (s[i]!='\0'){
         Send_Uart_Cmd(s[i]);

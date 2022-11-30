@@ -21,16 +21,16 @@ void ConfigureOscillator(void) {
     CLKDIVbits.PLLPOST = 0; // N2=2
     /* Fosc = M/(N1.N2)*Fin
      * Fin : 7.37MHz (quartz interne)
-     * Fosc à 80 MHZ (ne doit pas dépasser 80 MHZ)
+     * Fosc ï¿½ 80 MHZ (ne doit pas dï¿½passer 80 MHZ)
      * la solution la plus proche est 152*7.37/(7*2) = 80.017
-     * attention, cela entraine donc une FCY et une FPériphériques à 40 MHZ
+     * attention, cela entraine donc une FCY et une FPï¿½riphï¿½riques ï¿½ 40 MHZ
      */
     
     __builtin_write_OSCCONH(0x01);  // demande que next soit FRC avec PLL
     __builtin_write_OSCCONL(0x01);  // demande switch (et garde LPRC actif)
     
     while (OSCCONbits.OSWEN);   // attente de la fin du switch
-    while (!OSCCONbits.LOCK);   // attente que la PLL soit lockée sur se nouvelle configuration.
+    while (!OSCCONbits.LOCK);   // attente que la PLL soit lockï¿½e sur se nouvelle configuration.
     
     
 }
@@ -65,18 +65,25 @@ int main(void)
     
     
     uint32_t i=0;
-    u8 d = 0x01;
-    u8 f = 0;
+    u8 d[2];
     
-     // Transmit one character
+    TOF_I2C_Init();
+    for (i=0;i<1000;i++){Transmit_I2C_Loop();}
+    TOF_I2C_Start_Continuous(0x00);
+    printu("sc");
+    for (i=0;i<1000;i++){Transmit_I2C_Loop();}
+    i=0;
 
     while(1){
         i++;
         Transmit_I2C_Loop();
-        if (i==1000){
-            TOF_I2C_Read(f, 2 , &d);
-            f++;
+        if (i==100){
+            TOF_I2C_Read((RESULT_RANGE_STATUS+0x0A), 2, &d);
             i=0;
+            printu(d[0]);
+            printu(d[1]);
         }
+        
+        
     }
 }

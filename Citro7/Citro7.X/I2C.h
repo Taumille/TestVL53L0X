@@ -16,7 +16,7 @@
     }I2C_command;
 
     void Init_I2C(void);
-    void Add_I2C_command(uint8_t i2c_addr, uint8_t nbr_byte_send, uint8_t nbr_byte_read,uint8_t data_send[], uint8_t data_read[], void *Done);
+    void Add_I2C_command(uint8_t i2c_addr, uint8_t nbr_byte_send, uint8_t nbr_byte_read, uint8_t data_send[], uint8_t data_read[], void *Done);
     void Transmit_I2C_Loop(void);
 
 #else
