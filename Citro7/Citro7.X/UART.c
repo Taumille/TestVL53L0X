@@ -82,10 +82,31 @@ void Send_Uart_Cmd(u8 symbol) {
     IEC0bits.U1TXIE = 1;
 }
 
-void printu(u8 * s){
+void printu(char * s){
     u16 i = 0;
     while (s[i]!='\0'){
         Send_Uart_Cmd(s[i]);
         i++;
     }
+}
+
+void ConfigureUart(void){
+    U1MODEbits.STSEL = 0; // 1-Stop bit
+    U1MODEbits.PDSEL = 0; // No Parity, 8-Data bits
+    U1MODEbits.ABAUD = 0; // Auto-Baud disabled
+    U1MODEbits.BRGH = 0; // Standard-Speed mode
+    U1BRG = BRGVAL_UART_CMD; // Baud Rate setting for 9600
+    U1STAbits.UTXISEL0 = 0; // Interrupt after one TX character is transmitted
+    U1STAbits.UTXISEL1 = 0;
+    
+    _U1RXR = UART_RX_PIN_NB;
+    UART_TX_PIN_REG = _RPOUT_U1TX;
+    
+    IEC0bits.U1TXIE = 1; // Enable UART TX interrupt
+    U1MODEbits.UARTEN = 1; // Enable UART
+    U1STAbits.UTXEN = 1; // Enable UART TX
+    /* Wait at least 105 microseconds (1/9600) before sending first char */
+    
+    TRISCbits.TRISC2 = 0;
+
 }

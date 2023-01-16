@@ -19,7 +19,8 @@ extern "C" {
     
 void UART_Cmd_Init(void);
 void Send_Uart_Cmd(uint8_t);
-void printu(uint8_t *);
+void printu(char *);
+void ConfigureUart(void);
 
 #ifdef	__cplusplus
 }

@@ -10,6 +10,10 @@ u8 TOF_I2C_Read_Reg;
 u8 stop_variable=0x17;
 
 u8 TOF_Addr = 0x29;
+u32 TOF_timeout = 100;
+
+u8 tmp8;
+u8 tmp82[2];
 
 void TOF_I2C_Init (void)
 {
@@ -89,5 +93,68 @@ void TOF_I2C_Start_Continuous(uint32_t period_ms){
       timing = 0x02;
     // continuous back-to-back mode
     TOF_I2C_Write(SYSRANGE_START, 1, &timing); // VL53L0X_REG_SYSRANGE_MODE_BACKTOBACK
+  }
+  
+    TOF_State = 1;
+}
+
+void TOF_Get_Measure_Loop(uint16_t *distance){
+  switch (TOF_State)
+  {
+  case 0:
+    //Wait init
+    tmp82[0] = 0x00;
+    TOF_State++;
+    TOF_I2C_Start_Continuous(0x00);
+    for (uint8_t i=0;i<1000;i++){Transmit_I2C_Loop();}
+    break;
+  case 1:
+    TOF_I2C_Done = 0;
+    TOF_I2C_Read(RESULT_INTERRUPT_STATUS, 1, &tmp8);
+    tmp8 = tmp8 & 0x07;
+    TOF_Timer = Timer_ms1;
+    TOF_State++;
+    break;
+  case 2:
+    if (TOF_I2C_Done == 1){TOF_State++;TOF_I2C_Done = 0;}
+    else if (TOF_Timer - Timer_ms1 > TOF_timeout){TOF_State = 1;
+      printu("State");}
+    break;
+
+  case 3:
+    if (tmp8==0){
+      if (Timer_ms1 - TOF_Timer > TOF_timeout){
+        TOF_State = 0;
+        //timeout
+      }
+      else{
+        TOF_State = 1;
+        
+      }
+    }
+    else{
+      TOF_State++;
+    }
+    break;
+
+  case 4:
+    TOF_I2C_Read((RESULT_RANGE_STATUS+0x0A), 2, tmp82);
+    *distance = tmp82[0] + tmp82[1] * 256;
+    TOF_State ++;
+    break;
+  
+  case 5:
+    if (TOF_I2C_Done == 1){TOF_State++;}
+    break;
+
+  case 6:
+    tmp8 = 0x01;
+    TOF_I2C_Write(SYSTEM_INTERRUPT_CLEAR, 1, &tmp8);
+    TOF_State = 1;
+    break;
+
+
+  default:
+    break;
   }
 }
